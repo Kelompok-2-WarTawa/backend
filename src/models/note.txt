@@ -1,0 +1,8 @@
+i put this note because i dont have dual monitor, it painful to switching window/workspace each time i want to access this information
+so i can split my neovim into 2.
+
+Database: 
+
+Users (id, name, email, password, role), 
+Events (id, organizer_id, name, description, date, venue, capacity, ticket_price), 
+Bookings (id, event_id, attendee_id, quantity, total_price, booking_code, booking_date) 
