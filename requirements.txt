@@ -1,0 +1,9 @@
+alembic
+bcrypt
+hupper
+psycopg2-binary
+pyramid
+pyramid_tm
+python-dotenv
+sqlalchemy
+zope.sqlalchemy

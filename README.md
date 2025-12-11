@@ -3,7 +3,6 @@ this repo intend for "Backend for Tugas UAS Kelompok 2 WarTawa"
 
 # Documentation
 
-1. [models](src/models/model.md)
 
 # Role
 this backend role belong to
