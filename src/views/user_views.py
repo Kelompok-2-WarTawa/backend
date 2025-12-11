@@ -53,3 +53,32 @@ def login(request):
             "role": user.role.value
         }
     }
+
+
+@view_config(route_name='users_events', request_method='GET', renderer='json')
+def get_user_created_events(request):
+    user_id = int(request.matchdict['id'])
+    return request.services.event.get_by_organizer(user_id)
+
+
+@view_config(route_name='users_bookings', request_method='GET', renderer='json')
+def get_user_booking_history(request):
+    user_id = int(request.matchdict['id'])
+    bookings = request.services.booking.get_by_customer(user_id)
+
+    result = []
+    for b in bookings:
+        result.append({
+            "booking_code": b.booking_code,
+            "status": b.status.value,
+            "quantity": b.quantity,
+            "total_price": float(b.total_price),
+            "created_at": b.created_at.isoformat() if b.created_at else None,
+            "event": {
+                "id": b.event.id,
+                "name": b.event.name,
+                "date": b.event.date.isoformat(),
+                "venue": b.event.venue
+            }
+        })
+    return result

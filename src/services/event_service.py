@@ -49,3 +49,6 @@ class EventService:
         event = self.get_by_id(event_id)
         self.session.delete(event)
         return {"message": "Event deleted successfully"}
+
+    def get_by_organizer(self, user_id):
+        return self.session.query(Event).filter_by(organizer_id=user_id).all()

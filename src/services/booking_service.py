@@ -1,6 +1,7 @@
 import uuid
 from src.models import Booking, Payment, Event, BookingStatus, PaymentStatus
 from src.utils import NotFound, ValidationError
+from sqlalchemy.orm import joinedload
 
 
 class BookingService:
@@ -91,3 +92,10 @@ class BookingService:
         self.session.add(booking)
 
         return {"message": "Booking canceled, ticket quota been returned"}
+
+    def get_by_customer(self, user_id):
+        return self.session.query(Booking).\
+            options(joinedload(Booking.event)).\
+            filter_by(customer_id=user_id).\
+            order_by(Booking.created_at.desc()).\
+            all()
