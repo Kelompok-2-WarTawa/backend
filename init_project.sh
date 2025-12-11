@@ -3,6 +3,16 @@ VENV_DIR="venv"
 REQUIREMENTS_FILE="requirements.txt"
 PYTHON_BIN="python3"
 
+setup_env() {
+    if [ ! -f ".env" ]; then
+        echo "Creating .env configuration..."
+        cat <<EOT >> .env
+APP_PORT=
+DB_URL=
+EOT
+    fi
+}
+
 create_venv() {
     echo "creating venv in $VENV_DIR"
     $PYTHON_BIN -m venv "$VENV_DIR"
@@ -31,6 +41,7 @@ else
     echo "venv are already exist, skipping making the new one."
 fi
 
+setup_env
 activate_venv
 install_packages
 
