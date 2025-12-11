@@ -1,4 +1,6 @@
 from pyramid.view import view_config
+from src.schemas import UserRegisterSchema, UserLoginSchema
+from src.security import create_access_token
 
 
 @view_config(route_name='users_list', request_method='GET', renderer='json')
@@ -14,11 +16,11 @@ def get_user(request):
 
 @view_config(route_name='users_list', request_method='POST', renderer='json')
 def register(request):
-    data = request.json_body
+    payload = UserRegisterSchema(**request.json_body)
     user = request.services.user.create(
-        name=data.get('name'),
-        email=data.get('email'),
-        password=data.get('password')
+        name=payload.name,
+        email=payload.email,
+        password=payload.password
     )
     request.response.status_code = 201
     return user
@@ -39,19 +41,19 @@ def delete_user(request):
 
 @view_config(route_name='users_login', request_method='POST', renderer='json')
 def login(request):
-    data = request.json_body
+    payload = UserLoginSchema(**request.json_body)
+
     user = request.services.user.authenticate(
-        email=data.get('email'),
-        password=data.get('password')
+        email=payload.email,
+        password=payload.password
     )
-    return {  # JWT WIP (maybe later)
+
+    token = create_access_token(user.id)
+
+    return {
         "message": "Login successful",
-        "user": {
-            "id": user.id,
-            "name": user.name,
-            "email": user.email,
-            "role": user.role.value
-        }
+        "token": token,
+        "user": {"id": user.id, "name": user.name}
     }
 
 

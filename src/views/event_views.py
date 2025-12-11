@@ -1,4 +1,6 @@
 from pyramid.view import view_config
+from src.schemas import EventCreateSchema
+from src.security import get_current_user_id
 
 
 @view_config(route_name='events_list', request_method='GET', renderer='json')
@@ -14,9 +16,13 @@ def get_event(request):
 
 @view_config(route_name='events_list', request_method='POST', renderer='json')
 def create_event(request):
-    data = request.json_body
-    # organizer_id hardcoded as 1, because no middleware auth (jwt) yet
-    event = request.services.event.create(organizer_id=1, data=data)
+    user_id = get_current_user_id(request)
+
+    payload = EventCreateSchema(**request.json_body)
+
+    event = request.services.event.create(
+        organizer_id=user_id, data=payload.dict())
+
     request.response.status_code = 201
     return event
 

@@ -1,16 +1,19 @@
 from pyramid.view import view_config
 from decimal import Decimal
+from src.schemas import BookingCreateSchema, PaymentSchema
+from src.security import get_current_user_id
 
 
 @view_config(route_name='bookings_create', request_method='POST', renderer='json')
 def create_booking(request):
-    data = request.json_body
+    user_id = get_current_user_id(request)
 
-    # Hardcode customer_id=1 for simulation
+    payload = BookingCreateSchema(**request.json_body)
+
     booking = request.services.booking.create_booking(
-        customer_id=1,
-        event_id=int(data['event_id']),
-        quantity=int(data['quantity'])
+        customer_id=user_id,
+        event_id=payload.event_id,
+        quantity=payload.quantity
     )
     request.response.status_code = 201
     return booking
@@ -24,13 +27,15 @@ def get_booking(request):
 
 @view_config(route_name='bookings_pay', request_method='POST', renderer='json')
 def pay_booking(request):
+
     code = request.matchdict['code']
-    data = request.json_body
+    payload = PaymentSchema(**request.json_body)
 
-    amount = Decimal(str(data['amount']))
-    method = data['method']
-
-    return request.services.booking.pay_booking(code, amount, method)
+    return request.services.booking.pay_booking(
+        booking_code=code,
+        amount=payload.amount,
+        method=payload.method
+    )
 
 
 @view_config(route_name='bookings_cancel', request_method='POST', renderer='json')

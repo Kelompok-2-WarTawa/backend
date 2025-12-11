@@ -1,7 +1,7 @@
 def includeme(config):
     config.add_route('users_list',   '/users')
-    config.add_route('users_detail', '/users/{id}')
     config.add_route('users_login',  '/users/login')
+    config.add_route('users_detail', '/users/{id}')
     config.add_route('users_events', '/users/{id}/events')
     config.add_route('users_bookings', '/users/{id}/bookings')
 

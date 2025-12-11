@@ -7,3 +7,6 @@ pyramid_tm
 python-dotenv
 sqlalchemy
 zope.sqlalchemy
+pyjwt 
+pydantic 
+email-validator

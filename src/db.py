@@ -5,7 +5,6 @@ import zope.sqlalchemy
 
 
 def get_session_factory(settings):
-    settings['sqlalchemy.url'] = os.getenv('DB_URL')
     engine = engine_from_config(settings, 'sqlalchemy.')
     return sessionmaker(bind=engine)
 
