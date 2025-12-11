@@ -3,15 +3,28 @@ from src.schemas import UserRegisterSchema, UserLoginSchema
 from src.security import create_access_token
 
 
+def user_response(user):
+    return {
+        "id": user.id,
+        "name": user.name,
+        # i think email should be sanitized too
+        # or no ?
+        "email": user.email,
+        "role": user.role.value
+    }
+
+
 @view_config(route_name='users_list', request_method='GET', renderer='json')
 def list_users(request):
-    return request.services.user.get_all()
+    users = request.services.user.get_all()
+    return [user_response(u) for u in users]
 
 
 @view_config(route_name='users_detail', request_method='GET', renderer='json')
 def get_user(request):
     user_id = int(request.matchdict['id'])
-    return request.services.user.get_by_id(user_id)
+    user = request.services.user.get_by_id(user_id)
+    return user_response(user)
 
 
 @view_config(route_name='users_list', request_method='POST', renderer='json')
@@ -23,14 +36,17 @@ def register(request):
         password=payload.password
     )
     request.response.status_code = 201
-    return user
+
+    return user_response(user)
 
 
 @view_config(route_name='users_detail', request_method='PUT', renderer='json')
 def update_user(request):
     user_id = int(request.matchdict['id'])
     data = request.json_body
-    return request.services.user.update(user_id, data)
+    user = request.services.user.update(user_id, data)
+
+    return user_response(user)
 
 
 @view_config(route_name='users_detail', request_method='DELETE', renderer='json')
@@ -53,7 +69,7 @@ def login(request):
     return {
         "message": "Login successful",
         "token": token,
-        "user": {"id": user.id, "name": user.name}
+        "user": user_response(user)
     }
 
 

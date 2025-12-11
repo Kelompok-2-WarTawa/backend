@@ -1,6 +1,8 @@
 from pyramid.view import view_config
 from src.schemas import EventCreateSchema
 from src.security import get_current_user_id
+from src.models import Role
+from src.utils import AuthorizationError
 
 
 @view_config(route_name='events_list', request_method='GET', renderer='json')
@@ -17,12 +19,15 @@ def get_event(request):
 @view_config(route_name='events_list', request_method='POST', renderer='json')
 def create_event(request):
     user_id = get_current_user_id(request)
+    user = request.services.user.get_by_id(user_id)
+    if user.role != Role.ADMIN:
+        raise AuthorizationError("Only Admins can create events")
 
     payload = EventCreateSchema(**request.json_body)
-
     event = request.services.event.create(
-        organizer_id=user_id, data=payload.dict())
-
+        organizer_id=user.id,
+        data=payload.dict()
+    )
     request.response.status_code = 201
     return event
 

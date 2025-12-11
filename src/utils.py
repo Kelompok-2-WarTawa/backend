@@ -31,6 +31,11 @@ class AuthenticationError(AppError):
         super().__init__(message, status_code=401)
 
 
+class AuthorizationError(AppError):
+    def __init__(self, message="Access denied"):
+        super().__init__(message, status_code=403)
+
+
 def json_serializer(obj):
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
