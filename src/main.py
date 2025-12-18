@@ -1,14 +1,14 @@
-from src.app import init_app
-import os
 import sys
+import os
+
+sys.path.append(os.getcwd())
+
+from src.app import init_app
 from dotenv import load_dotenv
 from wsgiref.simple_server import make_server
 import hupper
 
 load_dotenv()
-
-sys.path.append(os.getcwd())
-
 
 def main():
     port = int(os.getenv('APP_PORT', 6543))
@@ -34,7 +34,7 @@ def main():
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nrver stopped.")
+        print("\nServer stopped.")
 
 
 if __name__ == '__main__':
