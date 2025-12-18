@@ -22,7 +22,7 @@ activate_venv() {
     source "$VENV_DIR/bin/activate"
 
     export PS1="(.venv) $PS1"
-    echo "🔧 Virtual environment activated."
+    echo "Virtual environment activated."
 }
 
 install_packages() {

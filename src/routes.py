@@ -14,3 +14,4 @@ def includeme(config):
     config.add_route('bookings_detail', '/api/bookings/{code}')
     config.add_route('bookings_pay',    '/api/bookings/{code}/pay')
     config.add_route('bookings_cancel', '/api/bookings/{code}/cancel')
+    config.add_route('bookings_checkin', '/api/bookings/{code}/checkin')

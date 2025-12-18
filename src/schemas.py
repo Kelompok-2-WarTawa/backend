@@ -6,6 +6,8 @@ class UserRegisterSchema(BaseModel):
     name: str = Field(..., min_length=3, max_length=100)
     email: EmailStr
     password: str = Field(..., min_length=6)
+    nik: str = Field(..., min_length=16, max_length=16, pattern=r'^\d+$')
+    phone_number: str = Field(..., min_length=10, max_length=15)
 
 
 class UserLoginSchema(BaseModel):
