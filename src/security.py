@@ -2,7 +2,9 @@ import os
 import jwt
 from datetime import datetime, timedelta, timezone
 from pyramid.request import Request
-from src.utils import AuthenticationError
+from functools import wraps
+from src.utils import AuthenticationError, AuthorizationError
+
 
 SECRET_KEY = os.getenv("JWT_SECRET", "fallback_secret")
 ALGORITHM = "HS256"
@@ -14,8 +16,7 @@ def create_access_token(user_id: int):
         "sub": str(user_id),
         "exp": expire
     }
-    encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def get_current_user_id(request: Request) -> int:
@@ -41,3 +42,36 @@ def get_current_user_id(request: Request) -> int:
 
     except (ValueError, jwt.ExpiredSignatureError, jwt.InvalidTokenError):
         raise AuthenticationError("Token expired or invalid")
+
+
+def login_required(func):
+    @wraps(func)
+    def wrapper(request, *args, **kwargs):
+        try:
+            user_id = get_current_user_id(request)
+        except AuthenticationError as e:
+            raise e
+
+        user = request.services.user.get_by_id(user_id)
+
+        request.user = user
+
+        return func(request, *args, **kwargs)
+    return wrapper
+
+
+def admin_required(func):
+    @wraps(func)
+    def wrapper(request, *args, **kwargs):
+        user_id = get_current_user_id(request)
+        user = request.services.user.get_by_id(user_id)
+
+        from src.models import Role
+
+        if user.role != Role.ADMIN:
+            raise AuthorizationError("Access Denied: Admin Only")
+
+        request.user = user
+
+        return func(request, *args, **kwargs)
+    return wrapper

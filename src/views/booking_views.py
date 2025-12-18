@@ -3,9 +3,11 @@ from src.schemas import BookingCreateSchema, PaymentSchema
 from src.security import get_current_user_id
 from src.models import Role
 from src.utils import AuthorizationError
+from src.security import admin_required, login_required
 
 
 @view_config(route_name='bookings_create', request_method='POST', renderer='json')
+@login_required
 def create_booking(request):
     user_id = get_current_user_id(request)
 
@@ -46,6 +48,7 @@ def cancel_booking(request):
 
 
 @view_config(route_name='bookings_checkin', request_method='POST', renderer='json')
+@admin_required
 def scan_ticket(request):
     # Admin check (masa penonton scan sendiri?)
     user_id = get_current_user_id(request)

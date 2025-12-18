@@ -6,23 +6,19 @@ from src.services import ServiceContainer
 from src.utils import json_serializer
 from src.config.errors import register_error_handlers
 
+from src.middleware import RateLimitMiddleware
+
 
 def init_app(settings=None):
-
     with Configurator(settings=settings) as config:
         config.include('pyramid_tm')
 
         sf = get_session_factory(config.get_settings())
         config.add_request_method(
-            lambda r: get_tm_session(sf, r.tm),
-            'dbsession',
-            reify=True
+            lambda r: get_tm_session(sf, r.tm), 'dbsession', reify=True
         )
-
         config.add_request_method(
-            lambda r: ServiceContainer(r.dbsession),
-            'services',
-            reify=True
+            lambda r: ServiceContainer(r.dbsession), 'services', reify=True
         )
 
         json_renderer = JSON()
@@ -34,4 +30,8 @@ def init_app(settings=None):
         config.include('src.routes')
         config.scan('src.views')
 
-        return config.make_wsgi_app()
+        app = config.make_wsgi_app()
+
+    app = RateLimitMiddleware(app)
+
+    return app

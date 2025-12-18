@@ -5,9 +5,10 @@ def includeme(config):
     config.add_route('users_events', r'/api/users/{id:\d+}/events')
     config.add_route('users_bookings', r'/api/users/{id:\d+}/bookings')
 
+    config.add_route('admin_dashboard', '/api/dashboard')
+
     config.add_route('events_list',    '/api/events')
     config.add_route('events_detail', r'/api/events/{id:\d+}')
-
     config.add_route('events_seats', r'/api/events/{id:\d+}/seats')
 
     config.add_route('bookings_create', '/api/bookings')
