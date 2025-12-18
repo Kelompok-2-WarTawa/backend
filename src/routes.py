@@ -8,6 +8,8 @@ def includeme(config):
     config.add_route('events_list',    '/api/events')
     config.add_route('events_detail', r'/api/events/{id:\d+}')
 
+    config.add_route('events_seats', r'/api/events/{id:\d+}/seats')
+
     config.add_route('bookings_create', '/api/bookings')
     config.add_route('bookings_detail', '/api/bookings/{code}')
     config.add_route('bookings_pay',    '/api/bookings/{code}/pay')

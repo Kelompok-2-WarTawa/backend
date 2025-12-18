@@ -1,7 +1,6 @@
 from datetime import datetime
-from src.models import Event
+from src.models import Event, Seat  # Import Seat
 from src.utils import NotFound, ValidationError
-
 
 class EventService:
     def __init__(self, session):
@@ -21,12 +20,23 @@ class EventService:
             try:
                 data['date'] = datetime.fromisoformat(data['date'])
             except ValueError:
-                raise ValidationError(
-                    "Wrong format. use ISO 8601 (YYYY-MM-DD HH:MM:SS)")
+                raise ValidationError("Wrong format. use ISO 8601 (YYYY-MM-DD HH:MM:SS)")
 
+        # 1. Buat Event
         event = Event(organizer_id=organizer_id, **data)
         self.session.add(event)
-        self.session.flush()
+        self.session.flush() # Flush agar event.id terbentuk
+
+        # 2. Generate Kursi Otomatis
+        # Label: Seat-1, Seat-2, dst.
+        seats = []
+        for i in range(1, event.capacity + 1):
+            seats.append(Seat(
+                event_id=event.id, 
+                seat_label=f"Seat-{i}"
+            ))
+        
+        self.session.add_all(seats)
         return event
 
     def update(self, event_id, data):

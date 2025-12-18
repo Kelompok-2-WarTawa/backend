@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .base import Base, BookingStatus, PaymentStatus
 
-
 class Booking(Base):
     __tablename__ = 'bookings'
     id = Column(Integer, primary_key=True)
@@ -18,6 +17,9 @@ class Booking(Base):
     event = relationship("Event", back_populates="bookings")
     customer = relationship("User", back_populates="bookings")
     payment = relationship("Payment", back_populates="booking", uselist=False)
+    
+    # Relasi ke Seat
+    seats = relationship("Seat", back_populates="booking")
 
 
 class Payment(Base):

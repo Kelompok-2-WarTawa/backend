@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, DateTime, Numeric, Text, Foreign
 from sqlalchemy.orm import relationship
 from .base import Base
 
-
 class Event(Base):
     __tablename__ = 'events'
     id = Column(Integer, primary_key=True)
@@ -16,3 +15,6 @@ class Event(Base):
 
     organizer = relationship("User", back_populates="events")
     bookings = relationship("Booking", back_populates="event")
+    
+    # Relasi ke Seat
+    seats = relationship("Seat", back_populates="event", cascade="all, delete-orphan")

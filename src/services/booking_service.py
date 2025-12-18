@@ -1,8 +1,7 @@
 import uuid
-from src.models import Booking, Payment, Event, BookingStatus, PaymentStatus
+from src.models import Booking, Payment, Event, Seat, BookingStatus, PaymentStatus # Tambah Seat
 from src.utils import NotFound, ValidationError
 from sqlalchemy.orm import joinedload
-
 
 class BookingService:
     def __init__(self, session):
@@ -20,21 +19,32 @@ class BookingService:
         if quantity <= 0:
             raise ValidationError("ticket availability need to be more than 0")
 
-        event = self.session.query(Event).with_for_update().get(event_id)
+        event = self.session.query(Event).get(event_id)
 
         if not event:
             raise NotFound("Event not found")
 
-        if event.capacity < quantity:
+        # LOGIKA BARU: Cari Kursi Kosong
+        available_seats = self.session.query(Seat).\
+            filter(Seat.event_id == event_id, Seat.booking_id == None).\
+            with_for_update().\
+            limit(quantity).\
+            all()
+
+        if len(available_seats) < quantity:
+            # Hitung sisa real untuk pesan error
+            sisa = self.session.query(Seat).filter(
+                Seat.event_id == event_id, Seat.booking_id == None).count()
+            
             raise ValidationError(
-                "Ticket overflows (lol)",
-                details={"requested": quantity, "available": event.capacity}
+                "Ticket overflows (Seat penuh)",
+                details={"requested": quantity, "available": sisa}
             )
 
         total_price = event.ticket_price * quantity
         booking_code = f"BKG-{uuid.uuid4().hex[:8].upper()}"
 
-        event.capacity -= quantity
+    
 
         booking = Booking(
             customer_id=customer_id,
@@ -46,21 +56,25 @@ class BookingService:
         )
 
         self.session.add(booking)
-        self.session.flush()
+        self.session.flush() 
+
+        
+        for seat in available_seats:
+            seat.booking_id = booking.id
+            self.session.add(seat)
+
         return booking
 
     def pay_booking(self, booking_code, amount, method):
         booking = self.get_booking(booking_code)
 
         if booking.status != BookingStatus.PENDING:
-            raise ValidationError(f"Booking Status: {
-                                  booking.status.value}")
+            raise ValidationError(f"Booking Status: {booking.status.value}")
 
         if amount < booking.total_price:
             raise ValidationError(
                 "Your money are not enough",
-                details={"required": float(
-                    booking.total_price), "given": float(amount)}
+                details={"required": float(booking.total_price), "given": float(amount)}
             )
 
         payment = Payment(
@@ -82,20 +96,20 @@ class BookingService:
         if booking.status == BookingStatus.CANCELLED:
             raise ValidationError("Booking been canceled previously")
 
-        if booking.status == BookingStatus.CONFIRMED:
-            pass
-
-        event = self.session.query(Event).get(booking.event_id)
-        event.capacity += booking.quantity
+        # Lepas Kursi (Kembalikan ke NULL)
+        for seat in booking.seats:
+            seat.booking_id = None
+            self.session.add(seat)
 
         booking.status = BookingStatus.CANCELLED
         self.session.add(booking)
 
-        return {"message": "Booking canceled, ticket quota been returned"}
+        return {"message": "Booking canceled, seats released"}
 
     def get_by_customer(self, user_id):
+        # Join seat juga biar user tahu dapat kursi mana aja
         return self.session.query(Booking).\
-            options(joinedload(Booking.event)).\
+            options(joinedload(Booking.event), joinedload(Booking.seats)).\
             filter_by(customer_id=user_id).\
             order_by(Booking.created_at.desc()).\
             all()
