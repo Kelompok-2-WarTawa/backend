@@ -1,8 +1,8 @@
-"""Reinitialization db
+"""Initial Migration for Neon DB
 
-Revision ID: f7497980a0e6
+Revision ID: 415050ec8971
 Revises: 
-Create Date: 2025-12-19 13:01:25.952187
+Create Date: 2025-12-19 19:32:46.867408
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f7497980a0e6'
+revision: str = '415050ec8971'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,10 +27,7 @@ def upgrade() -> None:
     sa.Column('email', sa.String(length=100), nullable=False),
     sa.Column('password', sa.String(length=255), nullable=False),
     sa.Column('role', sa.Enum('ADMIN', 'CUSTOMER', name='role'), nullable=True),
-    sa.Column('nik', sa.String(length=16), nullable=True),
-    sa.Column('phone_number', sa.String(length=20), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('nik')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_table('events',
@@ -41,36 +38,21 @@ def upgrade() -> None:
     sa.Column('date', sa.DateTime(), nullable=False),
     sa.Column('venue', sa.String(length=255), nullable=False),
     sa.Column('capacity', sa.Integer(), nullable=False),
-    sa.Column('image_url', sa.String(length=255), nullable=True),
-    sa.Column('status', sa.Enum('DRAFT', 'PUBLISHED', 'ENDED', name='eventstatus'), nullable=True),
+    sa.Column('ticket_price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.ForeignKeyConstraint(['organizer_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('ticket_phases',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('event_id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=50), nullable=False),
-    sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('quota', sa.Integer(), nullable=False),
-    sa.Column('start_date', sa.DateTime(), nullable=False),
-    sa.Column('end_date', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['event_id'], ['events.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('bookings',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('customer_id', sa.Integer(), nullable=True),
     sa.Column('event_id', sa.Integer(), nullable=True),
-    sa.Column('phase_id', sa.Integer(), nullable=False),
     sa.Column('booking_code', sa.String(length=50), nullable=True),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('total_price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('status', sa.Enum('PENDING', 'CONFIRMED', 'CANCELLED', name='bookingstatus'), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-    sa.Column('checked_in_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['customer_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['event_id'], ['events.id'], ),
-    sa.ForeignKeyConstraint(['phase_id'], ['ticket_phases.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_bookings_booking_code'), 'bookings', ['booking_code'], unique=True)
@@ -104,7 +86,6 @@ def downgrade() -> None:
     op.drop_table('payments')
     op.drop_index(op.f('ix_bookings_booking_code'), table_name='bookings')
     op.drop_table('bookings')
-    op.drop_table('ticket_phases')
     op.drop_table('events')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
