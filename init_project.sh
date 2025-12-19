@@ -11,7 +11,7 @@ APP_PORT=
 DB_URL=
 JWT_SECRET=
 FRONTEND_URL=
-        EOT
+EOT
     fi
 }
 
