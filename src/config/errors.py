@@ -42,4 +42,4 @@ def register_error_handlers(config):
     config.add_view(bad_request_view, context=HTTPBadRequest, renderer='json')
     config.add_view(pydantic_error_view,
                     context=PydanticValidationError, renderer='json')
-    # config.add_view(generic_error_view, context=Exception, renderer='json')
+    config.add_view(generic_error_view, context=Exception, renderer='json')

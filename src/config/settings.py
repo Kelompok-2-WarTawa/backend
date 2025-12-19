@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import os
 
 
 @dataclass(frozen=True)
@@ -23,7 +24,13 @@ class SecurityConfig:
     ACCESS_TOKEN_EXPIRE_HOURS: int = 24
 
 
+@dataclass(frozen=True)
+class AppConfig:
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+
 rate_limit_settings = RateLimitConfig()
 event_settings = EventConfig()
 booking_settings = BookingConfig()
 security_settings = SecurityConfig()
+app_settings = AppConfig()

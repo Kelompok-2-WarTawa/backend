@@ -9,7 +9,9 @@ setup_env() {
         cat <<EOT >> .env
 APP_PORT=
 DB_URL=
-EOT
+JWT_SECRET=
+FRONTEND_URL=
+        EOT
     fi
 }
 

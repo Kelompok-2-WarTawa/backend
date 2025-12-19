@@ -6,12 +6,15 @@ from src.services import ServiceContainer
 from src.utils import json_serializer
 from src.config.errors import register_error_handlers
 from src.middleware import RateLimitMiddleware
+from src.config.settings import app_settings
 
 
 def add_cors_headers_response_callback(event):
     def cors_headers(request, response):
+        frontend_url = app_settings.FRONTEND_URL
+
         response.headers.update({
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': frontend_url,
             'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
             'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept, Authorization',
             'Access-Control-Allow-Credentials': 'true',
