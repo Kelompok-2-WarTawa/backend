@@ -10,7 +10,13 @@ class RateLimitMiddleware:
         self.WINDOW = 60
 
     def __call__(self, environ, start_response):
-        ip = environ.get('REMOTE_ADDR')
+        x_forwarded = environ.get('HTTP_X_FORWARDED_FOR')
+
+        if x_forwarded:
+            ip = x_forwarded.split(',')[0].strip()
+        else:
+            ip = environ.get('REMOTE_ADDR')
+
         now = time.time()
 
         if ip not in self.requests:

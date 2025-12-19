@@ -77,3 +77,19 @@ class UserService:
             raise AuthenticationError("Wrong Email or Password")
 
         return user
+
+    def change_password_secure(self, user_id, old_password, new_password):
+        user = self.get_by_id(user_id)
+
+        if not bcrypt.checkpw(old_password.encode('utf-8'), user.password.encode('utf-8')):
+            raise ValidationError("old password wrong")
+
+        if len(new_password) < 6:
+            raise ValidationError("new password requiring atleast 6 character")
+
+        hashed = bcrypt.hashpw(new_password.encode(
+            'utf-8'), bcrypt.gensalt()).decode('utf-8')
+        user.password = hashed
+
+        self.session.add(user)
+        return {"message": "Password changed successfully"}

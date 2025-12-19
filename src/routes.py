@@ -4,6 +4,7 @@ def includeme(config):
     config.add_route('users_detail', r'/api/users/{id:\d+}')
     config.add_route('users_events', r'/api/users/{id:\d+}/events')
     config.add_route('users_bookings', r'/api/users/{id:\d+}/bookings')
+    config.add_route('users_change_password', r'/api/users/{id:\d+}/password')
 
     config.add_route('admin_dashboard', '/api/dashboard')
 

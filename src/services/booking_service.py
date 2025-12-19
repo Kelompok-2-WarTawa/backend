@@ -1,6 +1,6 @@
 import uuid
 from src.models import (Booking, Payment, Event, Seat,
-                        BookingStatus, PaymentStatus, User)
+                        BookingStatus, PaymentStatus, EventStatus, User)
 from src.utils import NotFound, ValidationError
 from datetime import datetime
 from sqlalchemy.orm import joinedload
@@ -28,6 +28,11 @@ class BookingService:
         if not event:
             raise NotFound("Event not found")
 
+        if event.status != EventStatus.PUBLISHED:
+            raise ValidationError("tickets event not opened yet.")
+
+        if event.date < datetime.now():
+            raise ValidationError("Event are done, cant buy the ticket.")
         user = self.session.query(User).get(customer_id)
         if not user.nik:
             raise ValidationError("Fullfill the NIK first")

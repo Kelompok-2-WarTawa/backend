@@ -19,3 +19,9 @@ class PaymentStatus(str, enum.Enum):
     SUCCESS = "success"
     FAILED = "failed"
     REFUNDED = "refunded"
+
+
+class EventStatus(str, enum.Enum):
+    DRAFT = "draft"
+    PUBLISHED = "published"
+    ENDED = "ended"

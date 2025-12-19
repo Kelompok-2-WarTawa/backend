@@ -4,7 +4,6 @@ hupper
 psycopg2-binary
 pyramid
 pyramid_tm
-pyramid_cors
 python-dotenv
 sqlalchemy
 zope.sqlalchemy

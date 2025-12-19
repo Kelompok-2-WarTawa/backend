@@ -5,8 +5,9 @@ from pyramid.request import Request
 from functools import wraps
 from src.utils import AuthenticationError, AuthorizationError
 
-
-SECRET_KEY = os.getenv("JWT_SECRET", "fallback_secret")
+SECRET_KEY = os.getenv("JWT_SECRET")
+if not SECRET_KEY:
+    raise ValueError("FATAL: JWT_SECRET environment variable not set!")
 ALGORITHM = "HS256"
 
 

@@ -1,14 +1,7 @@
 from sqlalchemy import (Column, Integer, String, DateTime,
                         Numeric, Text, ForeignKey, Enum as SAEnum)
 from sqlalchemy.orm import relationship
-from .base import Base
-import enum
-
-
-class EventStatus(str, enum.Enum):
-    DRAFT = "draft"
-    PUBLISHED = "published"
-    ENDED = "ended"
+from .base import Base, EventStatus
 
 
 class Event(Base):

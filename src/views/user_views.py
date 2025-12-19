@@ -2,7 +2,7 @@ from pyramid.view import view_config
 from sqlalchemy import func
 from src.schemas import UserRegisterSchema, UserLoginSchema
 from src.security import create_access_token, login_required, admin_required
-from src.utils import AuthorizationError
+from src.utils import AuthorizationError, ValidationError
 from src.models import Payment, Booking, Event
 
 
@@ -165,3 +165,21 @@ def admin_dashboard(request):
         "active_events": int(active_events),
         "recent_transactions": recent_transactions
     }
+
+
+@view_config(route_name='users_change_password', request_method='POST', renderer='json')
+@login_required
+def change_password(request):
+    user_id = int(request.matchdict['id'])
+
+    if request.user.id != user_id:
+        raise AuthorizationError("cant change other people accound")
+
+    data = request.json_body
+    old_pass = data.get('old_password')
+    new_pass = data.get('new_password')
+
+    if not old_pass or not new_pass:
+        raise ValidationError("Please fill your old password and new password")
+
+    return request.services.user.change_password_secure(user_id, old_pass, new_pass)
