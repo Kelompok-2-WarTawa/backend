@@ -1,5 +1,3 @@
-Berikut adalah isi lengkap file `README.md` yang telah diperbarui dengan mencantumkan seluruh endpoint API sesuai dengan struktur kode backend Anda:
-
 ```markdown
 # Backend - Tugas UAS Kelompok 2 WarTawa
 
