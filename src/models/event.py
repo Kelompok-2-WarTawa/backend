@@ -31,7 +31,7 @@ class Event(Base):
 
     capacity = Column(Integer, nullable=False)
 
-    image_url = Column(String(255), nullable=True)
+    image_url = Column(Text, nullable=True)
     status = Column(SAEnum(EventStatus), default=EventStatus.PUBLISHED)
 
     organizer = relationship("User", back_populates="events")

@@ -4,6 +4,7 @@ from src.schemas import UserRegisterSchema, UserLoginSchema
 from src.security import create_access_token, login_required, admin_required
 from src.utils import AuthorizationError, ValidationError
 from src.models import Payment, Booking, Event
+from src.models.base import PaymentStatus, BookingStatus
 
 
 def user_response(user):
@@ -139,10 +140,10 @@ def admin_dashboard(request):
     session = request.dbsession
 
     total_revenue = session.query(func.sum(Payment.amount))\
-        .filter(Payment.status == 'success').scalar() or 0
+        .filter(Payment.status == PaymentStatus.SUCCESS).scalar() or 0
 
     tickets_sold = session.query(func.sum(Booking.quantity))\
-        .filter(Booking.status == 'confirmed').scalar() or 0
+        .filter(Booking.status == BookingStatus.CONFIRMED).scalar() or 0
 
     active_events = session.query(func.count(Event.id)).scalar() or 0
 

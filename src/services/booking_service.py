@@ -155,10 +155,17 @@ class BookingService:
             seat.booking_id = None
             self.session.add(seat)
 
+        if booking.status == BookingStatus.CONFIRMED and booking.payment:
+            booking.payment.status = PaymentStatus.REFUNDED
+            self.session.add(booking.payment)
+            message = "Booking canceled, payment refunded"
+        else:
+            message = "Booking canceled, seats released"
+
         booking.status = BookingStatus.CANCELLED
         self.session.add(booking)
 
-        return {"message": "Booking canceled, seats released"}
+        return {"message": message}
 
     def get_by_customer(self, user_id):
         return self.session.query(Booking).\
