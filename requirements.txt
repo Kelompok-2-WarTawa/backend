@@ -10,3 +10,5 @@ zope.sqlalchemy
 pyjwt 
 pydantic 
 email-validator
+gunicorn
+

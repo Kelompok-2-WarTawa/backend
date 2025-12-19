@@ -1,0 +1,9 @@
+services:
+  wartawa-api:
+    build: .
+    container_name: wartawa-api
+    ports:
+      - "6543:6543"
+    env_file:
+      - .env
+    restart: unless-stopped
