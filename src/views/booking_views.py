@@ -16,16 +16,12 @@ def create_booking(request):
     booking = request.services.booking.create_booking(
         customer_id=user_id,
         event_id=payload.event_id,
-        quantity=payload.quantity
+        phase_id=payload.phase_id,
+        quantity=payload.quantity,
+        seat_ids=payload.seat_ids
     )
     request.response.status_code = 201
     return booking
-
-
-@view_config(route_name='bookings_detail', request_method='GET', renderer='json')
-def get_booking(request):
-    code = request.matchdict['code']
-    return request.services.booking.get_booking(code)
 
 
 @view_config(route_name='bookings_pay', request_method='POST', renderer='json')
@@ -64,29 +60,29 @@ def scan_ticket(request):
 @view_config(route_name='bookings_detail', request_method='GET', renderer='json')
 def get_booking(request):
     code = request.matchdict['code']
+
     booking = request.services.booking.get_booking(code)
 
     fake_va = f"8800{booking.customer_id:04d}{booking.id:04d}"
 
-    payment_method_display = "Virtual Account (BCA/Mandiri/BRI)"
-
+    payment_method = "Virtual Account"
     if booking.payment:
-        payment_method_display = booking.payment.method.upper()
+        payment_method = booking.payment.method.upper()
 
     return {
         "booking_code": booking.booking_code,
         "event_name": booking.event.name,
+
+        "ticket_type": booking.phase.name,
+
         "quantity": booking.quantity,
         "total_price": float(booking.total_price),
         "status": booking.status.value,
-
         "seat_labels": [s.seat_label for s in booking.seats],
-
         "payment_info": {
             "virtual_account": fake_va,
-            "bank": payment_method_display,
+            "bank": payment_method,
             "qr_string": booking.booking_code
         },
-
-        "check_in_status": "have entered" if booking.checked_in_at else "havent entered yet"
+        "check_in_status": "checked in" if booking.checked_in_at else "not checked in"
     }

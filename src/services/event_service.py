@@ -1,6 +1,7 @@
 from datetime import datetime
-from src.models import Event, Seat  # Import Seat
+from src.models import Event, Seat, TicketPhase
 from src.utils import NotFound, ValidationError
+
 
 class EventService:
     def __init__(self, session):
@@ -16,41 +17,63 @@ class EventService:
         return event
 
     def create(self, organizer_id, data):
+        if 'phases' not in data or not data['phases']:
+            raise ValidationError("Event must have at least 1 ticket phase")
+
+        phases_data = data.pop('phases')
+
         if isinstance(data.get('date'), str):
             try:
                 data['date'] = datetime.fromisoformat(data['date'])
             except ValueError:
-                raise ValidationError("Wrong format. use ISO 8601 (YYYY-MM-DD HH:MM:SS)")
+                raise ValidationError("Wrong format for event date")
 
-        # 1. Buat Event
+        total_capacity = sum(p['quota'] for p in phases_data)
+        data['capacity'] = total_capacity
+
         event = Event(organizer_id=organizer_id, **data)
         self.session.add(event)
-        self.session.flush() # Flush agar event.id terbentuk
+        self.session.flush()
 
-        # 2. Generate Kursi Otomatis
-        # Label: Seat-1, Seat-2, dst.
+        for p_data in phases_data:
+            phase = TicketPhase(
+                event_id=event.id,
+                name=p_data['name'],
+                price=p_data['price'],
+                quota=p_data['quota'],
+                start_date=datetime.fromisoformat(p_data['start_date']),
+                end_date=datetime.fromisoformat(p_data['end_date'])
+            )
+            self.session.add(phase)
+
         seats = []
-        for i in range(1, event.capacity + 1):
+        SEATS_PER_ROW = 10
+
+        for i in range(total_capacity):
+            row_idx = i // SEATS_PER_ROW
+
+            col_num = (i % SEATS_PER_ROW) + 1
+
+            row_char = chr(65 + row_idx)
+
+            label = f"{row_char}{col_num}"
+
             seats.append(Seat(
-                event_id=event.id, 
-                seat_label=f"Seat-{i}"
+                event_id=event.id,
+                seat_label=label
             ))
-        
+
         self.session.add_all(seats)
         return event
 
     def update(self, event_id, data):
         event = self.get_by_id(event_id)
-
-        for key in ['name', 'description', 'venue', 'capacity', 'ticket_price']:
+        for key in ['name', 'description', 'venue', 'image_url']:
             if key in data:
                 setattr(event, key, data[key])
 
         if 'date' in data:
-            if isinstance(data['date'], str):
-                event.date = datetime.fromisoformat(data['date'])
-            else:
-                event.date = data['date']
+            event.date = datetime.fromisoformat(data['date'])
 
         self.session.add(event)
         return event

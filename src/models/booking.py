@@ -1,7 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, Enum as SAEnum, DateTime
+from sqlalchemy import (Column, Integer, String,
+                        ForeignKey, Numeric, Enum as SAEnum, DateTime)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .base import Base, BookingStatus, PaymentStatus
+from .event import TicketPhase
 
 
 class Booking(Base):
@@ -9,20 +11,22 @@ class Booking(Base):
     id = Column(Integer, primary_key=True)
     customer_id = Column(Integer, ForeignKey('users.id'))
     event_id = Column(Integer, ForeignKey('events.id'))
+
+    phase_id = Column(Integer, ForeignKey('ticket_phases.id'), nullable=False)
+
     booking_code = Column(String(50), unique=True, index=True)
     quantity = Column(Integer, nullable=False)
     total_price = Column(Numeric(10, 2), nullable=False)
     status = Column(SAEnum(BookingStatus), default=BookingStatus.PENDING)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    checked_in_at = Column(DateTime, nullable=True)
 
     event = relationship("Event", back_populates="bookings")
     customer = relationship("User", back_populates="bookings")
     payment = relationship("Payment", back_populates="booking", uselist=False)
-
-    # Relasi ke Seat
     seats = relationship("Seat", back_populates="booking")
 
-    checked_in_at = Column(DateTime, nullable=True)
+    phase = relationship("TicketPhase", back_populates="bookings")
 
 
 class Payment(Base):

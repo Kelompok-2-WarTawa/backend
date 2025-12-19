@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, validator
 from typing import Optional
 from datetime import datetime
+from typing import List
 
 
 class UserRegisterSchema(BaseModel):
@@ -16,13 +17,29 @@ class UserLoginSchema(BaseModel):
     password: str
 
 
+class PhaseCreateSchema(BaseModel):
+    name: str = Field(..., min_length=3)
+    price: float = Field(..., ge=0)
+    quota: int = Field(..., gt=0)
+    start_date: str
+    end_date: str
+
+    @validator('end_date')
+    def end_date_must_be_after_start(cls, v, values):
+        if 'start_date' in values:
+            start = datetime.fromisoformat(values['start_date'])
+            end = datetime.fromisoformat(v)
+            if end <= start:
+                raise ValueError('End date must be after start date')
+        return v
+
+
 class EventCreateSchema(BaseModel):
     name: str = Field(..., min_length=3)
     description: Optional[str] = ""
     date: str
     venue: str
-    capacity: int = Field(..., gt=0)
-    ticket_price: float = Field(..., ge=0)
+    phases: list[PhaseCreateSchema]
 
     @validator('date')
     def date_must_be_future(cls, v):
@@ -40,7 +57,16 @@ class EventCreateSchema(BaseModel):
 
 class BookingCreateSchema(BaseModel):
     event_id: int
+    phase_id: int
     quantity: int = Field(..., gt=0)
+    seat_ids: List[int]
+
+    @validator('seat_ids')
+    def validate_seats_match_quantity(cls, v, values):
+        if 'quantity' in values and len(v) != values['quantity']:
+            raise ValueError(f"the seats quantity ({len(
+                v)}) bot same as booking quantity ({values['quantity']})")
+        return v
 
 
 class PaymentSchema(BaseModel):

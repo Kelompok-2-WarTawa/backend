@@ -1,9 +1,11 @@
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPNotFound
 from src.schemas import EventCreateSchema
-from src.security import get_current_user_id
-from src.models import Role, Seat  # Tambah Seat
+from src.security import get_current_user_id, admin_required
+from src.models import Role, Seat, Event, TicketPhase
 from src.utils import AuthorizationError
-from src.security import admin_required, login_required
+from sqlalchemy.orm import joinedload
+from datetime import datetime
 
 
 @view_config(route_name='events_list', request_method='GET', renderer='json')
@@ -14,7 +16,38 @@ def list_events(request):
 @view_config(route_name='events_detail', request_method='GET', renderer='json')
 def get_event(request):
     event_id = int(request.matchdict['id'])
-    return request.services.event.get_by_id(event_id)
+
+    event = request.dbsession.query(Event).\
+        options(joinedload(Event.phases)).\
+        get(event_id)
+
+    if not event:
+        raise HTTPNotFound()
+
+    phases_data = []
+    for p in event.phases:
+        phases_data.append({
+            "id": p.id,
+            "name": p.name,
+            "price": float(p.price),
+            "quota": p.quota,
+            "start_date": p.start_date.isoformat(),
+            "end_date": p.end_date.isoformat(),
+            "is_active": p.start_date <= datetime.now() <= p.end_date
+        })
+
+    return {
+        "id": event.id,
+        "organizer_id": event.organizer_id,
+        "name": event.name,
+        "description": event.description,
+        "date": event.date.isoformat(),
+        "venue": event.venue,
+        "image_url": event.image_url,
+        "total_capacity": event.capacity,
+        "status": event.status.value,
+        "phases": phases_data
+    }
 
 
 @view_config(route_name='events_seats', request_method='GET', renderer='json')
