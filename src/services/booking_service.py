@@ -5,6 +5,7 @@ from sqlalchemy import func
 from src.models import (Booking, Payment, Event, Seat, TicketPhase,
                         BookingStatus, PaymentStatus, EventStatus, User)
 from src.utils import NotFound, ValidationError
+from src.config.settings import booking_settings
 
 
 class BookingService:
@@ -73,9 +74,10 @@ class BookingService:
             .filter(Booking.status != BookingStatus.CANCELLED)\
             .scalar() or 0
 
-        if bought_count + quantity > 3:
+        limit = booking_settings.MAX_TICKETS_PER_USER
+        if bought_count + quantity > limit:
             raise ValidationError(
-                f"Max 3 tickets per person. You have {bought_count}")
+                f"Max {limit} tickets per person. You have {bought_count}")
 
         selected_seats = self.session.query(Seat).\
             filter(Seat.id.in_(seat_ids)).\

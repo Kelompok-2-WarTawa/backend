@@ -1,13 +1,14 @@
 import time
 from pyramid.httpexceptions import HTTPTooManyRequests
+from src.config.settings import rate_limit_settings
 
 
 class RateLimitMiddleware:
     def __init__(self, app):
         self.app = app
         self.requests = {}
-        self.LIMIT = 100
-        self.WINDOW = 60
+        self.LIMIT = rate_limit_settings.LIMIT
+        self.WINDOW = rate_limit_settings.WINDOW
 
     def __call__(self, environ, start_response):
         x_forwarded = environ.get('HTTP_X_FORWARDED_FOR')

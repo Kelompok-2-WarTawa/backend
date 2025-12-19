@@ -4,11 +4,12 @@ from datetime import datetime, timedelta, timezone
 from pyramid.request import Request
 from functools import wraps
 from src.utils import AuthenticationError, AuthorizationError
+from src.config.settings import security_settings
 
 SECRET_KEY = os.getenv("JWT_SECRET")
 if not SECRET_KEY:
     raise ValueError("FATAL: JWT_SECRET environment variable not set!")
-ALGORITHM = "HS256"
+ALGORITHM = security_settings.ALGORITHM
 
 
 def create_access_token(user_id: int):

@@ -1,6 +1,7 @@
 from datetime import datetime
 from src.models import Event, Seat, TicketPhase
 from src.utils import NotFound, ValidationError
+from src.config.settings import event_settings
 
 
 class EventService:
@@ -47,7 +48,7 @@ class EventService:
             self.session.add(phase)
 
         seats = []
-        SEATS_PER_ROW = 10
+        SEATS_PER_ROW = event_settings.SEATS_PER_ROW
 
         for i in range(total_capacity):
             row_idx = i // SEATS_PER_ROW
