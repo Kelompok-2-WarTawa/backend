@@ -1,4 +1,3 @@
-```markdown
 # Backend - Tugas UAS Kelompok 2 WarTawa
 
 Repositori ini berisi kode sumber backend untuk sistem ticketing stand-up comedy "WarTawa". Backend ini dibangun menggunakan framework **Pyramid**, **SQLAlchemy ORM**, dan **PostgreSQL**.
@@ -7,8 +6,13 @@ Repositori ini berisi kode sumber backend untuk sistem ticketing stand-up comedy
 
 ## 1. Tim dan Anggota
 **Kelompok 2 - WarTawa**
-* **Varasina Farmadani** - **123140107** (Backend Developer & Logic)
 * **Daffa Hakim Matondang** - **123140002** (Database Administrator & Schema)
+* **Arrauf Setiawan Muhammad Jabar** - **123140032** (Project Leader)
+* **Varasina Farmadani** - **123140107** (Backend Developer & Logic)
+* **Fadzilah saputri** - **123140149** (UI/UX Designer)
+* **Fadina Mustika Ratnaningsih** - **123140157** (Frontend Developer)
+
+
 
 ---
 
@@ -53,56 +57,42 @@ WarTawa adalah platform manajemen tiket acara stand-up comedy yang memungkinkan 
 ---
 
 ## 4. Cara Instalasi dan Menjalankan (Local Development)
-
 ### Prasyarat
 * Python 3.10+
 * PostgreSQL
-
 ### Langkah-langkah
 1. **Clone Repositori:**
    ```bash
    git clone <repository-url>
    cd kelompok-2-wartawa/backend/backend-0d81287bb3447ce049d5d5aeeaafecf3677036f1
 
-```
-
 2. **Inisialisasi Project:**
-Gunakan script otomatis untuk membuat Virtual Environment, install dependencies, dan setup `.env`.
-```bash
-chmod +x init_project.sh
-./init_project.sh
-
-```
-
+    Gunakan script otomatis untuk membuat Virtual Environment, install dependencies, dan setup `.env`.
+    ```bash
+    chmod +x init_project.sh
+    ./init_project.sh
 
 3. **Konfigurasi Environment:**
-Lengkapi file `.env` dengan konfigurasi berikut:
-```env
-APP_PORT=6543
-DB_URL=postgresql://username:password@localhost:5432/nama_db
-JWT_SECRET=rahasia_anda_disini
-
-```
-
+    Lengkapi file `.env` dengan konfigurasi berikut:
+    ```env
+    APP_PORT=6543
+    DB_URL=postgresql://username:password@localhost:5432/nama_db
+    JWT_SECRET=rahasia_anda_disini
 
 4. **Migrasi Database:**
-```bash
-source venv/bin/activate
-alembic upgrade head
-
-```
-
+    ```bash
+    source venv/bin/activate
+    alembic upgrade head
 
 5. **Jalankan Server:**
-```bash
-python src/main.py
+    ```bash
+    python src/main.py
 
+```
+**Server akan berjalan di `http://0.0.0.0:6543`.
 ```
 
 
-Server akan berjalan di `http://0.0.0.0:6543`.
-
----
 
 ## 5. Link Deployment
 
