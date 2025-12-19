@@ -96,8 +96,8 @@ WarTawa adalah platform manajemen tiket acara stand-up comedy yang memungkinkan 
 
 ## 5. Link Deployment
 
-* **Frontend:** 
-* **Backend API:** 
+* **Frontend:** https://wartawa.vercel.app/
+* **Backend API:** api.wartawa.online.
 
 ---
 
@@ -147,12 +147,12 @@ WarTawa adalah platform manajemen tiket acara stand-up comedy yang memungkinkan 
 ---
 
 ## 7. Screenshot Aplikasi
-
+SOON
 ---
 
 ## 8. Link Video Presentasi
 
-
+https://youtu.be/C2z0OSN27kc
 
 ```
 
