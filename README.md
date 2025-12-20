@@ -56,48 +56,46 @@ WarTawa adalah platform manajemen tiket acara stand-up comedy yang memungkinkan 
 
 ---
 
-## 4. Cara Instalasi dan Menjalankan (Local Development)
+## 4. Cara Instalasi dan Menjalankan (Docker Compose)
 ### Prasyarat
-* Python 3.10+
-* PostgreSQL
+* **Docker** dan **Docker Compose** terinstal di mesin Anda.
+* **PostgreSQL** (sebagai database utama).
 ### Langkah-langkah
 1. **Clone Repositori:**
-   ```bash
-   git clone <repository-url>
-   cd kelompok-2-wartawa/backend/backend-0d81287bb3447ce049d5d5aeeaafecf3677036f1
+```bash
+git clone <repository-url>
+cd kelompok-2-wartawa/backend
+```
 
-2. **Inisialisasi Project:**
-    Gunakan script otomatis untuk membuat Virtual Environment, install dependencies, dan setup `.env`.
-    ```bash
-    chmod +x init_project.sh
-    ./init_project.sh
+2. **Konfigurasi Environment:**
+Buat file `.env` di direktori utama backend dan lengkapi konfigurasi berikut:
+```env
+APP_PORT=6543
+DB_URL=postgresql://username:password@host.docker.internal:5432/nama_db
+JWT_SECRET=rahasia_anda_disini
+FRONTEND_URL=http://localhost:5173
+```
+*(Gunakan `host.docker.internal` jika database PostgreSQL berjalan di sistem host lokal Anda)*.
 
-3. **Konfigurasi Environment:**
-    Lengkapi file `.env` dengan konfigurasi berikut:
-    ```env
-    APP_PORT=6543
-    DB_URL=postgresql://username:password@localhost:5432/nama_db
-    JWT_SECRET=rahasia_anda_disini
+3. **Build dan Jalankan Kontainer:**
+Gunakan Docker Compose untuk membangun image dan menjalankan server API:
+```bash
+docker-compose up --build
+```
+Server akan berjalan di `http://localhost:6543**`.
 
 4. **Migrasi Database:**
-    ```bash
-    source venv/bin/activate
-    alembic upgrade head
-
-5. **Jalankan Server:**
-    ```bash
-    python src/main.py
-
-```
-**Server akan berjalan di `http://0.0.0.0:6543`.
+Setelah kontainer aktif, jalankan perintah migrasi di dalam kontainer untuk membuat struktur tabel:
+```bash
+docker exec -it wartawa-api alembic upgrade head
 ```
 
 
 
 ## 5. Link Deployment
 
-* **Frontend:** 
-* **Backend API:** 
+* **Frontend:** https://wartawa.vercel.app/
+* **Backend API:** api.wartawa.online
 
 ---
 
@@ -147,12 +145,12 @@ WarTawa adalah platform manajemen tiket acara stand-up comedy yang memungkinkan 
 ---
 
 ## 7. Screenshot Aplikasi
-
+SOON
 ---
 
 ## 8. Link Video Presentasi
 
-
+https://youtu.be/C2z0OSN27kc
 
 ```
 
